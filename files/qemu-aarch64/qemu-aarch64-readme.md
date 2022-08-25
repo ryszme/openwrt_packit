@@ -104,6 +104,13 @@ ssh 客户端是 windows 时，ssh 工具可以用 putty、xshell、securecrt �
 </div>
 
 ## 3. 在物理机中配置网络
+接键盘在物理机上操作
+如果`NetworkManager.service`是启用状态的话，需要关闭 `NetworkManager.service`
+```yaml
+systemctl stop NetworkManager.service
+systemctl disable NetworkManager.service
+init 6
+```
 
 注意：如果物理机只有 1 张网卡的话，要把 eth0 网络改成桥接，以便与虚机共用网卡。以 Armbian/Debian/ubuntu 为例：（其它操作系统请自行查询网桥配置方式）。
 `/etc/network/interfaces.d/br0`
@@ -121,12 +128,14 @@ iface br0 inet static
     bridge_stp off
     bridge_waitport 0
     bridge_fd 0
-    address 192.168.3.22
-    broadcast 192.168.3.255
+    address 10.1.1.5
+    broadcast 10.1.1.255
     netmask 255.255.255.0
-    gateway 192.168.3.1
-    dns-nameservers 192.168.3.1
+    gateway 10.1.1.1
+    dns-nameservers 10.1.1.1
 ```
+出错，armbian-config 配置网络
+
 物理机有 2 张网卡时，eth1 可以提供给虚拟机做 macvtap 口，但此时物理机自身就不能再使用 eth1 了，需要停用 NetworkManager.service, 并把 eth1 设置为手动:
 `/etc/network/interfaces.d/eth1`
 ```yaml
@@ -138,12 +147,7 @@ iface eth1 inet manual
 ```bash
 systemctl restart networking.service
 ```
-如果`NetworkManager.service`是启用状态的话，需要关闭 `NetworkManager.service`
-```yaml
-systemctl stop NetworkManager.service
-systemctl disable NetworkManager.service
-init 6
-```
+
 
 ## 4. 安装过程截图
 
